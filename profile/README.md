@@ -1,45 +1,40 @@
 # James AI Engineering Lab
 
-**James AI Engineering Lab** is a personal AI engineering lab focused on building reusable AI infrastructure and applying it across robotics, embedded/BMC engineering, finance, and future AI applications.
+**James AI Engineering Lab** is a personal AI engineering lab focused on reusable AI infrastructure and real-world AI systems across robotics and embedded engineering.
 
-## Architecture
+The goal is to build common AI infrastructure once, then reuse it across multiple domain applications without coupling applications to specific model implementations.
 
-```text
-                         James AI Engineering Lab
-                                  |
-                 +----------------+----------------+
-                 |                                 |
-         AI Infrastructure                    Applications
-                 |                                 |
-                 v                     +-----------+-----------+
-        inference-server               v           v           v
-                 |                 AI Robot     BMC Agent   Finance Agent
-                 |
-        KServe V2 / Open
-        Inference Protocol
-                 |
-          NVIDIA Triton
-                 |
-        +--------+---------+
-        v        v         v
-      Llama    Vision    Embedding
-             YOLO/DETR
-```
+![James AI Engineering Lab Architecture](assets/james-ai-engineering-lab-architecture.png)
+
+## Focus Areas
+
+### AI Infrastructure
+
+Designing reusable, containerized model-serving infrastructure with standardized inference interfaces for text, vision, embedding, audio, and future multimodal workloads.
+
+### Robotics & Embodied AI
+
+Building ROS 2 and NVIDIA Isaac Sim based robot systems that connect perception, AI reasoning, decision making, skills, and robot operation through clean runtime boundaries.
+
+### Embedded / BMC AI
+
+Applying AI agents and automation to embedded and BMC engineering workflows, including engineering data processing, issue analysis, and productivity tooling.
 
 ## Core Infrastructure
 
 ### `inference-server`
 
-General-purpose containerized AI model-serving infrastructure providing standardized inference APIs for text, vision, embedding, audio, and future multimodal workloads.
+General-purpose containerized AI model-serving infrastructure shared by multiple applications.
 
-Key principles:
+Key design principles:
 
-- Containerized and application-independent
-- KServe V2 / Open Inference Protocol compatible
-- NVIDIA Triton-based model serving
-- Model and backend selection through configuration
-- Shared by robotics, BMC, finance, and other AI applications
-- Applications consume AI capabilities without depending on specific model implementations
+- Application-independent model serving
+- Containerized runtime environment
+- KServe V2 / Open Inference Protocol compatible interfaces
+- NVIDIA Triton based serving architecture
+- Configuration-driven model and backend selection
+- Support for text, vision, embedding, audio, and future multimodal capabilities
+- Applications depend on AI capabilities rather than specific model implementations
 
 ## Projects
 
@@ -47,18 +42,22 @@ Key principles:
 |---|---|
 | `inference-server` | General-purpose AI model serving and inference infrastructure |
 | `ai-robot-system` | ROS 2 based robot intelligence and runtime architecture |
-| `isaac-projects` | NVIDIA Isaac Sim projects, environments, and validation assets |
+| `isaac-projects` | NVIDIA Isaac Sim projects, simulation environments, and validation assets |
 | `bmc-job-agent` | AI-assisted BMC engineering workflow and automation |
-| `finance-agent` | Future AI-assisted investment and financial analysis |
+| `finance-agent` | Future AI-assisted financial and investment analysis |
 
-## Design Principle
+## Architecture Principles
 
-> **Build AI infrastructure once, then reuse it across domain applications.**
+**Build AI infrastructure once, then reuse it across domain applications.**
 
-Applications own domain-specific logic and semantics. The inference server owns model execution, serving, acceleration, and standardized inference interfaces.
+The architecture separates responsibilities into clear layers:
 
-```text
-AI Robot --------+
-BMC Agent -------+----> inference-server ----> AI Models / GPU
-Finance Agent ---+
-```
+- **Inference infrastructure** owns model execution, acceleration, lifecycle, and standardized serving interfaces.
+- **Applications** own domain-specific workflows, semantics, reasoning, and business logic.
+- **Integration boundaries** remain model-independent so models and inference backends can evolve without requiring application architecture changes.
+
+This allows robotics, embedded engineering, finance, and future AI applications to share the same underlying inference infrastructure while remaining independently developed and deployed.
+
+## Technology Direction
+
+`Docker` · `NVIDIA Triton` · `KServe V2` · `Open Inference Protocol` · `ROS 2` · `NVIDIA Isaac Sim` · `Meta Llama` · `Computer Vision`
