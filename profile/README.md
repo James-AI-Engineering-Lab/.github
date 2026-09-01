@@ -1,80 +1,142 @@
 # James AI Engineering Lab
 
-James AI Engineering Lab is a personal AI engineering lab focused on building reusable **self-hosted AI infrastructure** and real-world AI systems across robotics and embedded engineering.
+James AI Engineering Lab is a personal AI engineering lab focused on
+building reusable **self-hosted AI infrastructure** and real-world AI
+systems across robotics and embedded engineering.
 
 The goal is simple:
 
-> **Build AI infrastructure once, then reuse it across domain applications.**
+> **Build AI infrastructure once, then reuse it across domain
+> applications.**
 
-Applications consume stable inference capabilities and remain independent from concrete model implementations, GPU runtime details, and model-serving frameworks.
+Applications use a reusable agent platform and standardized inference
+services while remaining independent from concrete agent runtimes, model
+implementations, GPU runtime details, and model-serving frameworks.
 
-![James AI Engineering Lab Architecture](assets/james-ai-engineering-lab-architecture.png)
+![James AI Engineering Lab
+Architecture](assets/james-ai-engineering-lab-architecture.png)
 
 ## Focus Areas
 
+### AI Agent Platform
+
+Building a reusable, domain-agnostic **agent-service** for agent runtime
+abstraction, orchestration, and **A2A agent-pool interoperability**.
+
+The platform is designed to connect both **internal agent runtimes** and
+**external A2A agents**, while domain knowledge, tools, policies, and
+execution remain in the corresponding applications or adapters.
+
 ### AI Infrastructure
 
-Designing reusable, containerized, **self-hosted model-serving infrastructure** for text, vision, embedding, audio, and future multimodal workloads.
+Designing reusable, containerized, **self-hosted model-serving
+infrastructure** for text, vision, embedding, audio, and future
+multimodal workloads.
 
-The current runtime uses **NVIDIA Triton Inference Server** on self-managed GPU resources, with **KServe V2 / Open Inference Protocol** as the standardized application boundary.
+The current runtime uses **NVIDIA Triton Inference Server** on
+self-managed GPU resources, with **KServe V2 / Open Inference Protocol**
+as the standardized model inference boundary.
 
-Model execution uses locally managed model weights and infrastructure. The current architecture does **not** depend on a cloud-hosted or CSP inference API.
+Model execution uses locally managed model weights and infrastructure.
+The current architecture does **not** depend on a cloud-hosted or CSP
+inference API.
 
 ### Robotics & Embodied AI
 
-Building ROS 2 and NVIDIA Isaac Sim based robot systems that connect perception, AI reasoning, decision making, skills, and robot operation through clean runtime boundaries.
-
-The robot stack consumes AI capabilities through standardized inference interfaces rather than embedding model frameworks directly into ROS application packages.
+Building ROS 2 and NVIDIA Isaac Sim based robot systems that connect
+perception, AI reasoning, decision making, skills, and robot operation
+through clean runtime boundaries.
 
 ### Embedded / BMC AI
 
-Applying AI agents and automation to embedded and BMC engineering workflows, including engineering data processing, issue analysis, and productivity tooling.
+Applying AI agents and automation to embedded and BMC engineering
+workflows, including engineering data processing, issue analysis, and
+productivity tooling.
 
-## Core Infrastructure
+## Core Platforms
+
+### `agent-service`
+
+General-purpose, domain-agnostic AI agent platform shared by domain
+applications.
+
+Public architecture:
+
+``` text
+Domain Applications / Adapters
+            |
+            v
+      agent-service
+   Agent Runtime / Orchestration
+          A2A Agent Pool
+        /              \
+       v                v
+Internal Agents    External A2A Agents
+        \              /
+         +------+-------+
+                |
+                v
+        inference-server
+```
+
+Key capabilities:
+
+-   Runtime-agnostic agent execution
+-   Generic agent orchestration
+-   Internal agent runtime integration
+-   External agent interoperability through A2A
+-   A2A agent-pool foundation
+-   Standardized model-provider boundary
+-   Domain-independent contracts
+-   Reusable across robotics, embedded/BMC, and future applications
+
+The public profile intentionally presents the **platform capabilities
+and boundaries** without exposing internal routing, delegation,
+runtime-selection, prompt, or agent-pool implementation details.
 
 ### `inference-server`
 
-General-purpose, self-hosted AI inference infrastructure shared by multiple applications.
+General-purpose, self-hosted AI inference infrastructure shared by
+multiple applications and agent runtimes.
 
 Current architecture:
 
-```text
-Applications
-    |
-    | KServe V2 / Open Inference Protocol
-    v
+``` text
+agent-service / Inference Clients
+            |
+            | KServe V2 / Open Inference Protocol
+            v
 NVIDIA Triton Inference Server
-    |
-    v
-Thin Triton Model Adapter
-    |
-    v
+            |
+            v
 Inference Service / Core
-    |
-    v
+            |
+            v
 Configuration-driven Backend
-    |
-    v
+            |
+            v
 Self-managed GPU + Local Model Store
 ```
 
 Key design principles:
 
-- Self-hosted inference on locally managed GPU resources
-- Application-independent model serving
-- Containerized runtime environment
-- KServe V2 / Open Inference Protocol compatible interfaces
-- NVIDIA Triton based serving runtime
-- Configuration-driven model and backend selection
-- Local/private model storage independent from Git
-- Support for text, vision, embedding, audio, and future multimodal capabilities
-- Applications depend on AI capabilities rather than specific model implementations
-- No dependency on a cloud-hosted/CSP inference API for the current runtime
+-   Self-hosted inference on locally managed GPU resources
+-   Application-independent model serving
+-   Containerized runtime environment
+-   KServe V2 / Open Inference Protocol compatible interfaces
+-   NVIDIA Triton based serving runtime
+-   Configuration-driven model and backend selection
+-   Local/private model storage independent from Git
+-   Support for text, vision, embedding, audio, and future multimodal
+    capabilities
+-   No dependency on a cloud-hosted/CSP inference API for the current
+    runtime
 
 The first validated runtime path is:
 
-```text
-KServe V2 Client
+``` text
+agent-service
+    -> KServe V2
     -> NVIDIA Triton
     -> text_generation
     -> Inference Service / Core
@@ -85,58 +147,82 @@ KServe V2 Client
 
 ## Projects
 
-| Repository | Purpose |
-| --- | --- |
-| `inference-server` | Self-hosted AI model serving and reusable inference infrastructure |
-| `ai-robot-system` | ROS 2 based robot intelligence, orchestration, and runtime architecture |
-| `isaac-projects` | NVIDIA Isaac Sim projects, simulation environments, and validation assets |
-| `bmc-job-agent` | AI-assisted BMC engineering workflow and automation |
-| `finance-agent` | Future AI-assisted financial and investment analysis |
+  -----------------------------------------------------------------------
+  Repository                          Purpose
+  ----------------------------------- -----------------------------------
+  `agent-service`                     Generic AI agent runtime,
+                                      orchestration, and A2A agent-pool
+                                      platform
+
+  `inference-server`                  Self-hosted AI model serving and
+                                      reusable inference infrastructure
+
+  `ai-robot-system`                   ROS 2 based robot intelligence and
+                                      runtime architecture
+
+  `isaac-projects`                    NVIDIA Isaac Sim projects,
+                                      simulation environments, and
+                                      validation assets
+
+  `bmc-job-agent`                     AI-assisted BMC engineering
+                                      workflow and automation
+
+  `finance-agent`                     Future AI-assisted financial and
+                                      investment analysis
+  -----------------------------------------------------------------------
 
 ## System Architecture
 
-```text
-                         Domain Applications
-             +------------------+------------------+
-             |                  |                  |
-             v                  v                  v
-      AI Robot System      BMC Job Agent     Future Applications
-             |                  |                  |
-             +------------------+------------------+
-                                |
-                   KServe V2 / Open Inference
-                                |
-                                v
-                 +-----------------------------+
-                 |      inference-server       |
-                 |                             |
-                 |      NVIDIA Triton          |
-                 |            |                |
-                 |   Inference Service/Core    |
-                 |            |                |
-                 |      Backend Factory        |
-                 +------------+----------------+
-                              |
-                    Configuration-driven
-                       Model Backends
-                              |
-                              v
-                 +-----------------------------+
-                 | Self-Hosted Compute         |
-                 | Self-managed NVIDIA GPU     |
-                 | Local / Private Model Store |
-                 +-----------------------------+
+``` text
+                           Domain Applications
+               +------------------+------------------+
+               |                  |                  |
+               v                  v                  v
+        AI Robot System      BMC Job Agent     Future Applications
+               |                  |                  |
+               +------------------+------------------+
+                                  |
+                                  v
+                     +--------------------------+
+                     |      agent-service       |
+                     | Generic Agent Platform   |
+                     | Runtime / Orchestration  |
+                     |      A2A Agent Pool      |
+                     +------+-------------+-----+
+                            |             |
+                  Internal  |             | A2A
+                   Agents   |             v
+                            |       External Agents
+                            |
+                            v
+                  KServe V2 / Open Inference
+                            |
+                            v
+                     inference-server
+                   NVIDIA Triton / Models
+                            |
+                            v
+                Self-Hosted GPU + Model Store
 ```
 
-For robotics, the inference infrastructure is one component of the larger end-to-end system:
+This public architecture intentionally shows **what the platform does
+and how the major systems relate**, while keeping internal agent-pool
+routing, delegation, runtime selection, prompt design, and execution
+mechanics private.
 
-```text
+For robotics:
+
+``` text
 Natural Language / Sensors
           |
           v
     ai-robot-system
           |
-          | standardized inference boundary
+          v
+     agent-service
+ Agent Runtime / A2A Pool
+          |
+          | KServe V2
           v
     inference-server
           |
@@ -154,55 +240,77 @@ Natural Language / Sensors
 
 ## Architecture Principles
 
-### Separate infrastructure from application semantics
+1.  **Separate domain execution from agent infrastructure**\
+    Robot, BMC, FinTech, and future applications own domain context,
+    capabilities, policies, and execution.
 
-Inference infrastructure owns:
+2.  **Keep the agent platform domain-agnostic**\
+    `agent-service` owns generic contracts, orchestration, runtime
+    abstraction, and agent interoperability.
 
-- Model execution
-- GPU acceleration
-- Model loading and lifecycle
-- Backend selection
-- Standardized inference interfaces
+3.  **Support internal and external agent pools**\
+    Internal runtimes and external agents can participate through a
+    common agent platform, with A2A used for agent-to-agent
+    interoperability.
 
-Applications own:
+4.  **Separate agent orchestration from model serving**\
+    `agent-service` handles agent behavior; `inference-server` handles
+    model execution.
 
-- Domain-specific workflows
-- Robot or engineering semantics
-- Reasoning and orchestration
-- Tool definitions and validation
-- Business logic
+5.  **Standardize the inference boundary**\
+    KServe V2 / Open Inference Protocol keeps model clients independent
+    from concrete model implementations.
 
-### Standardize the inference boundary
+6.  **Keep model selection configuration-driven**\
+    Current and planned model-family direction includes Meta --- Llama,
+    Google --- Gemma, and NVIDIA --- Cosmos.
 
-Applications communicate with the inference runtime through **KServe V2 / Open Inference Protocol**.
+7.  **Self-host model execution**\
+    Models run on self-managed compute with locally managed model
+    weights.
 
-This keeps clients independent from the concrete model implementation and allows model families or inference backends to evolve without requiring application architecture changes.
+## Platform Boundaries
 
-### Keep model selection configuration-driven
+``` text
+Domain Application / Adapter
+    = context + capabilities + execution
 
-Applications request logical capabilities. Concrete model families and runtime settings are selected by infrastructure configuration.
+agent-service
+    = generic agent runtime + orchestration
+      + internal/external A2A agent pool
 
-Current and planned model-family direction includes:
+inference-server
+    = model execution + lifecycle + GPU serving
 
-- Meta — Llama
-- Google — Gemma
-- NVIDIA — Cosmos
+isaac-projects
+    = simulation + digital-twin validation
+```
 
-### Self-host model execution
+Protocol boundaries:
 
-The current inference architecture runs on self-managed compute with locally managed model weights.
+``` text
+Application / Adapter -> agent-service
+    Generic application boundary
 
-**NVIDIA Triton is the self-hosted inference serving runtime; it is not being used here as a cloud/CSP inference API.**
+Agent <-> Agent
+    A2A
 
-KServe V2 / Open Inference Protocol defines the standardized data-plane interface between applications and the inference server.
+agent-service -> inference-server
+    KServe V2 / Open Inference Protocol
+
+Agent -> Tool / Data
+    Domain-owned integration
+```
 
 ## Repository Boundaries
 
-During development of the complete AI Robot architecture, the repositories are validated together through system milestones.
+The repositories are validated together through system milestones but
+are designed to evolve as independently maintained platform components:
 
-Long term, they are intended to evolve as independently maintained platform components:
+``` text
+agent-service
+    generic agent runtime and A2A interoperability platform
 
-```text
 inference-server
     reusable AI inference infrastructure
 
@@ -213,8 +321,11 @@ isaac-projects
     simulation assets and Isaac integration
 ```
 
-Stable interfaces between these repositories allow each component to be versioned and maintained independently, similar to SDK/runtime/platform dependencies.
+Stable interfaces allow each component to be versioned and maintained
+independently.
 
 ## Technology Direction
 
-`Docker` · `NVIDIA Triton` · `KServe V2` · `Open Inference Protocol` · `Self-Hosted GPU Inference` · `ROS 2` · `NVIDIA Isaac Sim` · `Meta Llama` · `Computer Vision`
+`Docker` · `AI Agent Runtime` · `A2A` · `Agent Pool` · `NVIDIA Triton` ·
+`KServe V2` · `Open Inference Protocol` · `Self-Hosted GPU Inference` ·
+`ROS 2` · `NVIDIA Isaac Sim` · `Meta Llama` · `Computer Vision`
