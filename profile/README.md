@@ -27,6 +27,12 @@ The platform is designed to connect both **internal agent runtimes** and
 **external A2A agents**, while domain knowledge, tools, policies, and
 execution remain in the corresponding applications or adapters.
 
+### MCP & Tool Integration
+
+Building a reusable, domain-agnostic **mcp-service** based on the **Model Context Protocol (MCP)** so AI agents can connect to tools, data, and external systems through a standard interface.
+
+This keeps Robot, BMC, Finance, and future domain capabilities independent from the shared agent platform.
+
 ### AI Infrastructure
 
 Designing reusable, containerized, **self-hosted model-serving
@@ -94,6 +100,12 @@ The public profile intentionally presents the **platform capabilities
 and boundaries** without exposing internal routing, delegation,
 runtime-selection, prompt, or agent-pool implementation details.
 
+### `mcp-service`
+
+Generic MCP service shared by agent-based applications.
+
+Its role is simple: provide a standard bridge between AI agents and reusable tools, data, and domain capabilities without putting domain-specific implementation inside the common AI platform.
+
 ### `inference-server`
 
 General-purpose, self-hosted AI inference infrastructure shared by
@@ -154,6 +166,9 @@ agent-service
                                       orchestration, and A2A agent-pool
                                       platform
 
+  `mcp-service`                       Generic MCP service for reusable
+                                      tools, data, and capability access
+
   `inference-server`                  Self-hosted AI model serving and
                                       reusable inference infrastructure
 
@@ -183,26 +198,17 @@ agent-service
                +------------------+------------------+
                                   |
                                   v
-                     +--------------------------+
-                     |      agent-service       |
-                     | Generic Agent Platform   |
-                     | Runtime / Orchestration  |
-                     |      A2A Agent Pool      |
-                     +------+-------------+-----+
-                            |             |
-                  Internal  |             | A2A
-                   Agents   |             v
-                            |       External Agents
-                            |
-                            v
-                  KServe V2 / Open Inference
-                            |
-                            v
-                     inference-server
-                   NVIDIA Triton / Models
-                            |
-                            v
-                Self-Hosted GPU + Model Store
+                         agent-service
+                  Agent Runtime / A2A Platform
+                         /           \
+                        /             \
+                       v               v
+                mcp-service      inference-server
+               Tools / Data       Model Serving
+                    |                  |
+                    v                  v
+             Domain Systems      Self-Hosted GPU
+             & Capabilities       + Model Store
 ```
 
 This public architecture intentionally shows **what the platform does
@@ -253,19 +259,23 @@ Natural Language / Sensors
     common agent platform, with A2A used for agent-to-agent
     interoperability.
 
-4.  **Separate agent orchestration from model serving**\
+4.  **Use MCP for reusable tool and data integration**\
+    `mcp-service` provides a standard bridge from agents to tools, data,
+    and domain capabilities.
+
+5.  **Separate agent orchestration from model serving**\
     `agent-service` handles agent behavior; `inference-server` handles
     model execution.
 
-5.  **Standardize the inference boundary**\
+6.  **Standardize the inference boundary**\
     KServe V2 / Open Inference Protocol keeps model clients independent
     from concrete model implementations.
 
-6.  **Keep model selection configuration-driven**\
+7.  **Keep model selection configuration-driven**\
     Current and planned model-family direction includes Meta --- Llama,
     Google --- Gemma, and NVIDIA --- Cosmos.
 
-7.  **Self-host model execution**\
+8.  **Self-host model execution**\
     Models run on self-managed compute with locally managed model
     weights.
 
@@ -278,6 +288,9 @@ Domain Application / Adapter
 agent-service
     = generic agent runtime + orchestration
       + internal/external A2A agent pool
+
+mcp-service
+    = MCP-based tools + data + capability access
 
 inference-server
     = model execution + lifecycle + GPU serving
@@ -295,11 +308,14 @@ Application / Adapter -> agent-service
 Agent <-> Agent
     A2A
 
+agent-service -> mcp-service
+    MCP (Model Context Protocol)
+
 agent-service -> inference-server
     KServe V2 / Open Inference Protocol
 
-Agent -> Tool / Data
-    Domain-owned integration
+mcp-service -> Tool / Data / Domain System
+    Domain-owned capability integration
 ```
 
 ## Repository Boundaries
@@ -310,6 +326,9 @@ are designed to evolve as independently maintained platform components:
 ``` text
 agent-service
     generic agent runtime and A2A interoperability platform
+
+mcp-service
+    reusable MCP tool and capability integration
 
 inference-server
     reusable AI inference infrastructure
@@ -326,6 +345,6 @@ independently.
 
 ## Technology Direction
 
-`Docker` · `AI Agent Runtime` · `A2A` · `Agent Pool` · `NVIDIA Triton` ·
+`Docker` · `AI Agent Runtime` · `A2A` · `MCP` · `Agent Pool` · `NVIDIA Triton` ·
 `KServe V2` · `Open Inference Protocol` · `Self-Hosted GPU Inference` ·
 `ROS 2` · `NVIDIA Isaac Sim` · `Meta Llama` · `Computer Vision`
