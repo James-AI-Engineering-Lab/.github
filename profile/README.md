@@ -13,8 +13,21 @@ Applications use a reusable agent platform and standardized inference
 services while remaining independent from concrete agent runtimes, model
 implementations, GPU runtime details, and model-serving frameworks.
 
-![James AI Engineering Lab
-Architecture](assets/james-ai-engineering-lab-architecture.png)
+
+
+## 01 — Overall Engineering Portfolio
+
+![Engineering Capabilities & Showcases](assets/engineering-showcases.png)
+
+## 02 — Agentic AI Platform Architecture
+
+![James AI Engineering Lab Architecture](assets/james-ai-engineering-lab-architecture.png)
+
+## 03 — Physical AI Robotics Architecture
+
+*ROS 2 / NVIDIA Isaac Sim — Architecture & Showcase coming later.*
+
+## 04 — Technical Overview
 
 ## Focus Areas
 
